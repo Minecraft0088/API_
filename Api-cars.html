@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>API</title>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  </head>
+  <style>
+* {
+  box-sizing: content-box;
+  padding: 0;
+  margin: 0;
+}
+
+
+</style>
+
+<div class="container">
+  <div class="row justify-content-center m-3">
+    <div class="col-md-2 col-lg-4">
+      <select id="car-year" class="form-control mb-3 h-50">
+        <option value="">--All--</option>
+      </select>
+    </div>
+    <div class="col-md-2 col-lg-4">
+      <select id="car-color" class="form-control mb-3 h-50">
+        <option value="">--All color--</option>
+      </select>
+    </div>
+    <div class="col-md-2 col-lg-2">
+      <button type="button" class="btn btn-danger btn-block">Select car</button>
+    </div>
+  </div>
+</div>
+
+
+    <div class="container">
+	<div id="results" class="row d-flex justify-content-center m-3">
+	</div>
+	</div>
+<script>
+let carsData;
+var htmlcod="";
+const apiUrl = 'https://freetestapi.com/api/v1/cars';
+
+fetch(apiUrl)
+  .then(response => {
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+   carsData = data;
+
+const selectedData = [];
+
+    data.forEach(car => {
+      const { year, color } = car;
+      selectedData.push({ year, color });
+    });
+	
+	  selectedData.forEach(car => {
+      // console.log(car.year);
+    });
+	
+const set1 = new Set(selectedData.map(item => item.year)); 
+const set2 = new Set(selectedData.map(item => item.color));
+ 
+set1.forEach(year => {
+  myFunction(year);
+});
+
+set2.forEach(color => {
+  myFunction2(color);
+});
+
+    //console.log(set1);
+})	
+
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+  });
+  
+  
+ /////////////////////funksiya 
+function myFunction(m) {
+  var x = document.getElementById("car-year"); 
+  var option = document.createElement("option");
+  option.text = m;
+  x.add(option);
+};
+/////////////////////funksiya-2
+function myFunction2(j) {
+  var x = document.getElementById("car-color"); 
+  var option = document.createElement("option");
+  option.text = j;
+  x.add(option);
+};
+
+  
+var first_se = document.getElementById("car-year");  
+var second_se = document.getElementById("car-color"); 
+var button =  document.querySelector(".btn"); 
+
+window.addEventListener("load", (event) => {
+second_se.disabled=true;
+fetch(apiUrl)
+.then(response => response.json())
+        .then(data => { 
+            data.forEach(element => {
+              htmlcod+=`<div class="col-sm-6 col-md-4 col-lg-3">
+			  <div class="card" style="width: 100%;">
+  <img class="card-img-top" src="${element.image}" alt="Card image cap">
+  <div class="card-body">
+    <h5 class="card-title">${element.make}</h5>
+    <p class="card-text">${element.engine}</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</div>
+</div>`;
+ document.getElementById("results").innerHTML = htmlcod;
+});
+});
+});
+
+first_se.addEventListener("change",function(){
+if (first_se.selectedIndex === 0) {
+  second_se.disabled=true;
+}else {
+  second_se.disabled=false;
+};
+
+
+})
+
+button.addEventListener("click", function() {
+    var selectedYear = first_se.value;
+    var selectedColor = second_se.value;
+    var htmlself = ""; 
+    var cars1 = carsData.filter(car => car.year == selectedYear && car.color == selectedColor);
+    var cars2 = carsData.filter(car => car.year == selectedYear);
+
+    if(second_se.selectedIndex == 0)
+    {
+      cars2.forEach(car => {
+            htmlself += `<div class="col-md-3">
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="${car.image}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">${car.make}</h5>
+                        <p class="card-text">${car.engine}</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                    </div>
+                </div>
+            </div>`;
+        });
+    };
+    if (first_se.selectedIndex !== 0) {   
+        document.getElementById("results").innerHTML = "";
+        cars1.forEach(car => {
+            htmlself += `<div class="col-md-3">
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="${car.image}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">${car.make}</h5>
+                        <p class="card-text">${car.engine}</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                    </div>
+                </div>
+            </div>`;
+        });
+        document.getElementById("results").innerHTML = htmlself; 
+    }else 
+    { 
+      document.getElementById("results").innerHTML = htmlcod; 
+    };
+    
+});
+
+</script>
+ 
+  </body>
+</html>
